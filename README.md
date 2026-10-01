@@ -34,3 +34,29 @@ Then check the pushed branch:
 git show renovate/github.com-google-uuid-1.x:lib/go.sum | tail -1
 git show renovate/github.com-google-uuid-1.x:app/go.sum | tail -1
 ```
+
+## Verified
+
+Run with Renovate from source, `binarySource=global`, Go 1.26.1.
+
+| Renovate | `updatedArtifacts` | `lib/go.sum` | `app/go.sum` |
+| --- | --- | --- | --- |
+| `main` (8f2ffc0e90) | `["app/go.sum", "lib/go.sum", "app/go.mod", "app/go.sum"]` | marker present | **marker missing** |
+| with [#46626](https://github.com/renovatebot/renovate/pull/46626) (03dd814a16) | `["app/go.sum", "lib/go.sum", "app/go.mod"]` | marker present | marker present |
+
+Both runs logged `Post-upgrade file saved` twice. The branches Renovate pushed are kept:
+
+- [`evidence/unpatched-main`](../../tree/evidence/unpatched-main)
+- [`evidence/with-fix`](../../tree/evidence/with-fix)
+
+The only difference between them is the line the bug dropped:
+
+```console
+$ git diff origin/evidence/unpatched-main origin/evidence/with-fix
+--- a/app/go.sum
++++ b/app/go.sum
+@@ -1,2 +1,3 @@
+ github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
+ github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
++// renovate-post-upgrade-marker
+```
